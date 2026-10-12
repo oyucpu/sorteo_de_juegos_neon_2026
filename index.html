@@ -387,6 +387,17 @@
     letter-spacing:0.04em;
     word-break:break-all;
   }
+  .modal-code-box code.masked{
+    filter:blur(6px);
+    user-select:none;
+    cursor:pointer;
+    transition:filter .2s;
+  }
+  .modal-code-box .code-actions{
+    display:flex;
+    gap:8px;
+    flex-shrink:0;
+  }
   .modal-code-box code.empty{
     color:var(--ink-dim);
     font-style:italic;
@@ -590,8 +601,11 @@
         <div>
           <p class="modal-section-label">Código del juego</p>
           <div class="modal-code-box">
-            <code class="${g.code ? '' : 'empty'}" id="modalCode">${g.code ? g.code : 'Sin código añadido'}</code>
-            <button class="copy-btn" id="copyCodeBtn" ${g.code ? '' : 'disabled'}>Copiar</button>
+            <code class="${g.code ? 'masked' : 'empty'}" id="modalCode">${g.code ? g.code : 'Sin código añadido'}</code>
+            <div class="code-actions">
+              ${g.code ? '<button class="copy-btn" id="toggleCodeBtn">Mostrar</button>' : ''}
+              <button class="copy-btn" id="copyCodeBtn" ${g.code ? '' : 'disabled'}>Copiar</button>
+            </div>
           </div>
         </div>
         <div>
@@ -608,6 +622,14 @@
     document.getElementById('modalClose').addEventListener('click', closeModal);
     const copyBtn = document.getElementById('copyCodeBtn');
     if(g.code){
+      const codeEl = document.getElementById('modalCode');
+      const toggleBtn = document.getElementById('toggleCodeBtn');
+      const toggleCode = () => {
+        const hidden = codeEl.classList.toggle('masked');
+        toggleBtn.textContent = hidden ? 'Mostrar' : 'Ocultar';
+      };
+      toggleBtn.addEventListener('click', toggleCode);
+      codeEl.addEventListener('click', () => { if(codeEl.classList.contains('masked')) toggleCode(); });
       copyBtn.addEventListener('click', () => {
         navigator.clipboard.writeText(g.code).then(() => {
           copyBtn.textContent = 'Copiado';
